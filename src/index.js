@@ -12,10 +12,13 @@ server.listen(serverPort, () => {
   console.log(`Server listening at http://localhost:${serverPort}`);
 });
 server.get('/movies', (req, resp) => {
-  console.log(req.query);
-  // resp.json(movieData);
+  console.log(req.query.gender);
   const genderFilterParam = movieData.filter(
     (movie) => movie.gender === req.query.gender
   );
-  resp.json(genderFilterParam);
+  const response = {
+    success: true,
+    movies: genderFilterParam,
+  };
+  resp.json(response);
 });
