@@ -13,9 +13,13 @@ server.listen(serverPort, () => {
 });
 server.get('/movies', (req, resp) => {
   console.log(req.query.gender);
-  const genderFilterParam = movieData.filter(
-    (movie) => movie.gender === req.query.gender
-  );
+  const genderFilterParam = movieData.filter((movie) => {
+    if (req.query.gender === '') {
+      return true;
+    } else {
+      return movie.gender === req.query.gender;
+    }
+  });
   const response = {
     success: true,
     movies: genderFilterParam,
