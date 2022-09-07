@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const movieData = require('./data/movies.json');
+const users = require('./data/users.json');
 // create and config server
 const server = express();
 server.use(cors());
@@ -28,6 +29,18 @@ server.get('/movies', (req, resp) => {
     movies: genderFilterParam,
   };
   resp.json(response);
+});
+
+server.post('/login', (req, resp) => {
+  console.log(req.body);
+  const oneUser = users
+    .find((user) => user.email === req.body.email)
+    .find((user) => user.password === req.body.password);
+  if (oneUser) {
+    resp.json({ success: true, userId: 'id_de_la_usuaria_encontrada' });
+  } else {
+    resp.json({ success: false, errorMessage: 'Usuaria/o no encontrada/o' });
+  }
 });
 
 server.get('/movie/:movieId', (req, res) => {
