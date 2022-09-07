@@ -6,6 +6,9 @@ const server = express();
 server.use(cors());
 server.use(express.json());
 
+// template engines
+server.set('view engine', 'ejs');
+
 // init express aplication
 const serverPort = 4000;
 server.listen(serverPort, () => {
@@ -27,8 +30,20 @@ server.get('/movies', (req, resp) => {
   resp.json(response);
 });
 
+server.get('/movie/:movieId', (req, res) => {
+  const foundMovie = movieData.find(
+    (oneMovie) => oneMovie.id === req.params.movieId
+  );
+  console.log(foundMovie);
+  res.render('movie', foundMovie);
+});
+
+// static servers
 const staticServer = './src/public-react';
 server.use(express.static(staticServer));
 
 const staticServerImages = './src/public-movies-images';
 server.use(express.static(staticServerImages));
+
+const staticServerStyles = './src/public-css';
+server.use(express.static(staticServerStyles));
