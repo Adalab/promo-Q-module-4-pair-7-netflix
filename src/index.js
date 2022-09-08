@@ -2,10 +2,16 @@ const express = require('express');
 const cors = require('cors');
 const movieData = require('./data/movies.json');
 const users = require('./data/users.json');
+const Database = require('better-sqlite3');
+const db = new Database('./src/db/database.db', { verbose: console.log });
 // create and config server
 const server = express();
 server.use(cors());
-server.use(express.json());
+server.use(
+  express.json({
+    limit: '25mb',
+  })
+);
 
 // template engines
 server.set('view engine', 'ejs');
@@ -15,20 +21,35 @@ const serverPort = 4000;
 server.listen(serverPort, () => {
   console.log(`Server listening at http://localhost:${serverPort}`);
 });
+
 server.get('/movies', (req, resp) => {
-  console.log(req.query.gender);
-  const genderFilterParam = movieData.filter((movie) => {
-    if (req.query.gender === '') {
-      return true;
-    } else {
-      return movie.gender === req.query.gender;
-    }
-  });
-  const response = {
+  // console.log('consoleando', response);
+  console.log('Ver las query params', req.query.gender);
+  let response = [];
+  if (req.query.gender === '') {
+    const query = db.prepare(`SELECT * FROM movies ORDER BY title DESC`);
+    response = query.all();
+  } else {
+    const query = db.prepare(
+      `SELECT *FROM movies  WHERE gender =? ORDER BY title DESC`
+    );
+    response = query.all(req.query.gender);
+  }
+  // const genderFilterParam = movieData.filter((movie) => {
+  //   if (req.query.gender === '') {
+  //     return true;
+  //   } else {
+  //     return movie.gender === req.query.gender;
+  //   }
+  // });
+  // const response = {
+  //   success: true,
+  //   movies: genderFilterParam,
+  // };
+  resp.json({
     success: true,
-    movies: genderFilterParam,
-  };
-  resp.json(response);
+    movies: response,
+  });
 });
 
 server.post('/login', (req, resp) => {
