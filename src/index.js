@@ -4,6 +4,7 @@ const users = require('./data/users.json');
 const Database = require('better-sqlite3');
 const { query } = require('express');
 const db = new Database('./src/db/database.db', { verbose: console.log });
+const dbUsers = new Database('./src/db/users.db', { verbose: console.log });
 // create and config server
 const server = express();
 server.use(cors());
@@ -54,9 +55,14 @@ server.get('/movies', (req, resp) => {
 
 server.post('/login', (req, resp) => {
   console.log(req.body);
-  const oneUser = users
-    .find((user) => user.email === req.body.email)
-    .find((user) => user.password === req.body.password);
+  const queryUsers = dbUsers.prepare(
+    `SELECT * FROM users WHERE  email = ?  AND  password = ?`
+  );
+  const oneUser = queryUsers.get(req.body.email, req.body.password);
+
+  // const oneUser = users
+  //   .find((user) => user.email === req.body.email)
+  //   .find((user) => user.password === req.body.password);
   if (oneUser) {
     resp.json({ success: true, userId: 'id_de_la_usuaria_encontrada' });
   } else {
