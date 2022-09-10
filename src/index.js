@@ -98,6 +98,12 @@ server.post('/sign-up', (req, resp) => {
   }
 });
 
+server.post('/user/profile', (req, resp) => {
+  console.log('Esto deberia de ser el userid', req.headers);
+
+  //queda punto 5 de BD II!!!!!!
+});
+
 server.get('/movie/:movieId', (req, res) => {
   const query = db.prepare(`SELECT * FROM movies WHERE id = ?`);
   const movieId = query.get(req.params.movieId);
