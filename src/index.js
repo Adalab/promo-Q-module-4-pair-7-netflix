@@ -1,6 +1,5 @@
 const express = require('express');
 const cors = require('cors');
-const users = require('./data/users.json');
 const Database = require('better-sqlite3');
 const { query } = require('express');
 const db = new Database('./src/db/database.db', { verbose: console.log });
@@ -67,6 +66,35 @@ server.post('/login', (req, resp) => {
     resp.json({ success: true, userId: 'id_de_la_usuaria_encontrada' });
   } else {
     resp.json({ success: false, errorMessage: 'Usuaria/o no encontrada/o' });
+  }
+});
+
+server.post('/sign-up', (req, resp) => {
+  console.log('LLegan por body al sign-up', req.body);
+  const queryUniqueEmail = dbUsers.prepare(
+    `SELECT * FROM users WHERE email = ? `
+  );
+  const checkMail = queryUniqueEmail.get(req.body.email);
+
+  if (checkMail) {
+    resp.json({ success: false, errorMessage: 'Usuaria ya existente' });
+  } else {
+    const querySignUp = dbUsers.prepare(
+      `INSERT INTO users (email, password) VALUES (?, ?)`
+    );
+    const result = querySignUp.run(req.body.email, req.body.password);
+    console.log('Que es result', result);
+    if (result) {
+      resp.json({
+        success: true,
+        userId: `nuevo-id-añadido, el id es: ${result.lastInsertRowid} `,
+      });
+    } else {
+      resp.json({
+        success: false,
+        errorMessage: 'Tienes que rellenar todos los campos',
+      });
+    }
   }
 });
 
