@@ -58,12 +58,13 @@ server.post('/login', (req, resp) => {
     `SELECT * FROM users WHERE  email = ?  AND  password = ?`
   );
   const oneUser = queryUsers.get(req.body.email, req.body.password);
+  console.log('Esto es oneUser', oneUser);
 
   // const oneUser = users
   //   .find((user) => user.email === req.body.email)
   //   .find((user) => user.password === req.body.password);
   if (oneUser) {
-    resp.json({ success: true, userId: 'id_de_la_usuaria_encontrada' });
+    resp.json({ success: true, userId: oneUser.id });
   } else {
     resp.json({ success: false, errorMessage: 'Usuaria/o no encontrada/o' });
   }
@@ -126,6 +127,7 @@ server.get('/my-movies', (req, res) => {
   );
   // obtenemos el id de la usuaria
   const userId = req.header('user-id');
+  console.log('El id que está llegando', userId);
   // ejecutamos la query
   const movieIds = movieIdsQuery.all(userId); // que nos devuelve algo como [{ movieId: 1 }, { movieId: 2 }];
 
